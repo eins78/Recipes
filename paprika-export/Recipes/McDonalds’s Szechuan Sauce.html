@@ -5,14 +5,14 @@
         <style type="text/css">
             /* Shared styles */
             body {
-                font-family: HelveticaNeue, sans-serif;
+                font-family: Helvetica, sans-serif;
                 font-size: 16.0px;
                 color: #34302e;
                 margin: 0.25in;
             }
             .name {
                 font-size: 18.0px;
-                font-family: Futura, Helvetica, sans-serif;
+                font-family: Helvetica, sans-serif;
                 font-weight: normal;
                 margin: 0 0 10px 0;
             }
@@ -40,8 +40,14 @@
                 text-transform: uppercase;
                 margin: 10px 0;
             }
+            
             .ingredients p {
                 margin: 4px 0;
+            }
+            /* To prevent nutrition/directions from getting too close
+               to ingredients */
+            .ingredients {
+                padding-bottom: 10px;
             }
             .clear {
                 clear:both;
@@ -55,24 +61,22 @@
                 line-height: 130%;
             }
             .photobox {
+                
                 float: left;
                 margin-right: 14px;
+                
+                
             }
             .photo {
-                
-                
-                max-width: 140px;
-                max-height: 140px;
+                max-width: 140.0px;
+                max-height: 140.0px;
                 width: auto;
                 height: auto;
-                
             }
-            .columnbox {
-                
-            }
+            
             .inline-image {
-                max-width: 140px;
-                max-height: 140px;
+                max-width: 25%;
+                max-height: 25%;
                 width: auto;
                 height: auto;
             }
@@ -83,11 +87,22 @@
             .pswp__caption__center {
                 text-align: center !important;
             }
+            .recipe {
+                
+                page-break-after: always;
+                
+                
+            }
+            .recipe:first-child {
+                border-top: 0 none;
+                margin-top: 0;
+                padding-top: 0;
+            }
         </style>
     </head>
     <body>
         <!-- Recipe -->
-<div class="recipe" itemscope itemtype="http://schema.org/Recipe">
+<div class="recipe" itemscope itemtype="http://schema.org/Recipe" >
     
     <div class="infobox">
 
@@ -96,7 +111,7 @@
         <div class="photobox">
             
             <a href="#">
-                <img src="Images/A6E2E60D-E4FB-42C0-9DC8-D2B1AA007FFF-3511-0000013886FB249A/9CA48053-60A9-4FC8-91D0-DD2A83D01B57-3511-0000013958FD7679.jpg" itemprop="image" class="photo photoswipe"/>
+                <img src="Images/F4B0F7DE-9D28-4F1F-8672-A1AB99716B71-20083-00000AEA73F2BB8C/35D6FD77-0315-42BB-B4D3-7E83DC11E6B1-518-00000109915404F3.jpg" itemprop="image" class="photo photoswipe"/>
             </a>
             
             
@@ -104,7 +119,7 @@
         
 
         <!-- Name -->
-        <h1 itemprop="name" class="name">VEGAN ELOTE (Mexican Street Corn)</h1>
+        <h1 itemprop="name" class="name">McDonalds’s Szechuan Sauce</h1>
         
         <!-- Info -->
         
@@ -112,18 +127,24 @@
         <!-- Rating, categories -->
         <p itemprop="aggregateRating" class="rating" value="0"></p>
         
+            <p itemprop="recipeCategory" class="categories">Condiments, Junk Food</p>
+        
         
         <p class="metadata">
         
             <!-- Cook time, prep time, servings, difficulty -->
+            
+            <b>Prep Time: </b><span itemprop="prepTime">5 mins</span>
+            
+            <b>Cook Time: </b><span itemprop="cookTime">34 mins</span>
             
 
             <!-- Source -->
             
                 <b>Source: </b>
                 
-                    <a itemprop="url" href="https://reddit.com/r/veganrecipes/comments/hfvnk8/vegan_elote_mexican_street_corn/">
-                        <span itemprop="author">reddit.com</span>
+                    <a itemprop="url" href="https://topsecretrecipes.com/foodhackerblog/mcdonalds-szechuan-sauce/">
+                        <span itemprop="author">topsecretrecipes.com</span>
                     </a>
                 
                 
@@ -131,18 +152,20 @@
         </p>
         
         
+        
         <div class="clear"></div>
+        
 
     </div>
     
-    <div class="columnbox">
+    <div class="left-column">
 
         <!-- Ingredients -->
         
         <div class="ingredientsbox">
             <h3 class="subhead">Ingredients</h3>
             <div class="ingredients text">
-                <p class="line" itemprop="recipeIngredient"><strong>8</strong> ears sweet corn, husks removed</p><p class="line" itemprop="recipeIngredient"><strong>1/2</strong> cup vegan sour cream</p><p class="line" itemprop="recipeIngredient"><strong>1/2</strong> cup vegan mayonnaise</p><p class="line" itemprop="recipeIngredient"><strong>1/2</strong> cup fresh cilantro</p><p class="line" itemprop="recipeIngredient"><strong>1</strong> clove garlic, sliced</p><p class="line" itemprop="recipeIngredient"><strong>1/2</strong> tsp chipotle powder</p><p class="line" itemprop="recipeIngredient"><strong>1</strong> lime, zested</p><p class="line" itemprop="recipeIngredient"><strong>1</strong> tsp chili powder</p><p class="line" itemprop="recipeIngredient"><strong>1/3</strong> cup vegan parmesan cheese, shredded</p><p class="line" itemprop="recipeIngredient">Lime wedges, to serve</p>
+                <p class="line" itemprop="recipeIngredient"><strong>1</strong> cup plus 1/2 cup water</p><p class="line" itemprop="recipeIngredient"><strong>1/2</strong> cup soy sauce</p><p class="line" itemprop="recipeIngredient"><strong>2</strong> tablespoons ginger paste</p><p class="line" itemprop="recipeIngredient"><strong>1</strong> tablespoon minced garlic</p><p class="line" itemprop="recipeIngredient"><strong>1/4</strong> teaspoon sesame oil</p><p class="line" itemprop="recipeIngredient"><strong>1/8</strong> teaspoon salt</p><p class="line" itemprop="recipeIngredient"><strong>2</strong> tablespoons cornstarch</p><p class="line" itemprop="recipeIngredient"><strong>7</strong> tablespoons granulated sugar</p><p class="line" itemprop="recipeIngredient"><strong>1/4</strong> teaspoon ground Szechuan peppercorns (see step #1 for prep)</p><p class="line" itemprop="recipeIngredient"><strong>1/4</strong> teaspoon black pepper (fine grind)</p><p class="line" itemprop="recipeIngredient"><strong>1/4</strong> teaspoon coriander</p><p class="line" itemprop="recipeIngredient"><strong>3</strong> tablespoons rice vinegar</p><p class="line" itemprop="recipeIngredient"><strong>1</strong> teaspoon apple cider vinegar</p><p class="line" itemprop="recipeIngredient"><strong>1</strong> tablespoon lime juice</p>
             </div>
         </div>
         
@@ -152,7 +175,9 @@
 
     </div>
     
-    <!-- Descriptino -->
+    <div class="right-column">
+    
+    <!-- Description -->
     
 
     <!-- Directions -->
@@ -160,21 +185,12 @@
     <div class="directionsbox">
         <h3 class="subhead">Directions</h3>
         <div itemprop="recipeInstructions" class="directions text">
-            <p class="line">1. In a food processer, add the vegan sourcream, vegan mayonnaise, cilantro, garlic, chipotle powder, lime zest and juice from 1/2 the lime. Taste and season with a pinch of salt. Set aside.</p><p class="line">2. Heat grill to 400F(medium high). Grill the corn approximately <span class='timer' time='720.0'>12 minutes</span>, turning every <span class='timer' time='180.0'>3 minutes</span>, until kernels begin to turn golden brown and look charred. Remove.</p><p class="line">3. To serve, brush each ear of corn with the cream mixture. Sprinkle with chili powder, vegan parmesan cheese, additional chopped cilantro. Serve with lime wedges on the side.<br/></p>
+            <p class="line">Before starting the sauce prepare the Szechuan peppercorns by toasting around 2 tablespoons in a sauté pan over medium heat for 5 minutes or until fragrant and slightly darkened. Grind the toasted peppercorns in a spice grinder, coffee grinder, or mortar and pestle until fine, and then sift it through a wire mesh strainer to remove the big pieces.</p><p class="line">Make the sauce by combining 1 cup of water with soy sauce, sesame oil, ginger, garlic and salt in a small saucepan over medium heat. When the mixture begins to bubble reduce the heat and simmer for 12 minutes. Cover the pan and let the mixture steep for 12 minutes, then pour the sauce through a wire mesh strainer. Add the strained sauce back into the saucepan.</p><p class="line">Mix 2 tablespoons of cornstarch into the remaining 1/2 cup of water until dissolved. Pour this slurry into the saucepan along with the sugar, ground Szechuan peppercorns, black pepper, and coriander. Heat over medium until bubbling, then reduce the heat and simmer for 3 minutes. It should be much thicker. Remove the sauce from the heat and let it cool for 3 minutes, uncovered.</p><p class="line">Add the vinegars and lime juice, and let it cool down before using. Store the sauce covered in your refrigerator and it will last for several weeks. Stir well before using.</p>
         </div>
     </div>
     
 
     <!-- Notes -->
-    
-    
-    <div class="notesbox">
-        <h3 class="subhead">Notes</h3>
-        <div itemprop="comment" class="notes text">
-            <p><br/>by www.instagram.com/felinefrenzied</p>
-        </div>
-    </div>
-    
     
 
     <!-- Nutrition (in regular mode it goes below the notes) -->
@@ -184,10 +200,15 @@
 
     
     
+    </div>
+    
+    <div class="clear"></div>
+
 </div>
 
-        
-        <!-- PhotoSwipe gallery -->
+
+<!-- Photo gallery is only included when exporting. -->
+<!-- PhotoSwipe gallery -->
 
 <link rel="stylesheet" href="Resources/PhotoSwipe/photoswipe.css">
 <link rel="stylesheet" href="Resources/PhotoSwipe/default-skin/default-skin.css">
@@ -229,10 +250,10 @@
         var items = [
             
             {
-                msrc: 'Images/A6E2E60D-E4FB-42C0-9DC8-D2B1AA007FFF-3511-0000013886FB249A/7CDB255A-7B3E-4646-99C6-48434DE31A38-3511-000001390663543C.jpg',
-                src: 'Images/A6E2E60D-E4FB-42C0-9DC8-D2B1AA007FFF-3511-0000013886FB249A/7CDB255A-7B3E-4646-99C6-48434DE31A38-3511-000001390663543C.jpg',
-                w: 2048.0,
-                h: 1536.0,
+                msrc: 'Images/F4B0F7DE-9D28-4F1F-8672-A1AB99716B71-20083-00000AEA73F2BB8C/0718EBD7-2CBF-4D1A-A802-FF9773A4CFB9-518-000001093DB305A9.jpg',
+                src: 'Images/F4B0F7DE-9D28-4F1F-8672-A1AB99716B71-20083-00000AEA73F2BB8C/0718EBD7-2CBF-4D1A-A802-FF9773A4CFB9-518-000001093DB305A9.jpg',
+                w: 700.0,
+                h: 500.0,
                 title: '1'
             },
             
@@ -270,6 +291,9 @@
     }
 </script>
 
-        
+
+
+
+
     </body>
 </html>

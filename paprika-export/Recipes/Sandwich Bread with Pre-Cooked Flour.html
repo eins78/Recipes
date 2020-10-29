@@ -5,14 +5,14 @@
         <style type="text/css">
             /* Shared styles */
             body {
-                font-family: HelveticaNeue, sans-serif;
+                font-family: Helvetica, sans-serif;
                 font-size: 16.0px;
                 color: #34302e;
                 margin: 0.25in;
             }
             .name {
                 font-size: 18.0px;
-                font-family: Futura, Helvetica, sans-serif;
+                font-family: Helvetica, sans-serif;
                 font-weight: normal;
                 margin: 0 0 10px 0;
             }
@@ -40,8 +40,14 @@
                 text-transform: uppercase;
                 margin: 10px 0;
             }
+            
             .ingredients p {
                 margin: 4px 0;
+            }
+            /* To prevent nutrition/directions from getting too close
+               to ingredients */
+            .ingredients {
+                padding-bottom: 10px;
             }
             .clear {
                 clear:both;
@@ -55,24 +61,22 @@
                 line-height: 130%;
             }
             .photobox {
+                
                 float: left;
                 margin-right: 14px;
+                
+                
             }
             .photo {
-                
-                
-                max-width: 140px;
-                max-height: 140px;
+                max-width: 140.0px;
+                max-height: 140.0px;
                 width: auto;
                 height: auto;
-                
             }
-            .columnbox {
-                
-            }
+            
             .inline-image {
-                max-width: 140px;
-                max-height: 140px;
+                max-width: 25%;
+                max-height: 25%;
                 width: auto;
                 height: auto;
             }
@@ -83,11 +87,22 @@
             .pswp__caption__center {
                 text-align: center !important;
             }
+            .recipe {
+                
+                page-break-after: always;
+                
+                
+            }
+            .recipe:first-child {
+                border-top: 0 none;
+                margin-top: 0;
+                padding-top: 0;
+            }
         </style>
     </head>
     <body>
         <!-- Recipe -->
-<div class="recipe" itemscope itemtype="http://schema.org/Recipe">
+<div class="recipe" itemscope itemtype="http://schema.org/Recipe" >
     
     <div class="infobox">
 
@@ -133,11 +148,13 @@
         </p>
         
         
+        
         <div class="clear"></div>
+        
 
     </div>
     
-    <div class="columnbox">
+    <div class="left-column">
 
         <!-- Ingredients -->
         
@@ -154,7 +171,9 @@
 
     </div>
     
-    <!-- Descriptino -->
+    <div class="right-column">
+    
+    <!-- Description -->
     
 
     <!-- Directions -->
@@ -162,7 +181,7 @@
     <div class="directionsbox">
         <h3 class="subhead">Directions</h3>
         <div itemprop="recipeInstructions" class="directions text">
-            <p class="line">To a medium saucepan, add the flour and milk listed above. Turn the heat to medium-low and cook, whisking continuously, until the mixture thickens and becomes like a paste, about <span class='timer' time='300.0'>5-8 minutes</span>. In the beginning, whisk vigorously to break up any flour clumps, and be diligent about this near the end to avoid burning. The mixture won’t seem to do anything until it reaches a critical heat point, be patient; it will thicken.</p><p class="line">Once it transforms into a viscous paste (something like oatmeal porridge), remove the pan from the heat and spread the paste out on a small plate to expedite cooling. Set aside until called for when mixing.</p><p class="line">I used my KitchenAid stand mixer to mix this dough, but it’s possible to make this bread without a stand mixer by mixing everything together by hand in a mixing bowl. To do this, you’ll need to mix for around <span class='timer' time='600.0'>10-15 minutes</span>, depending on your technique (slap and fold will work really well!).</p><p class="line">Mixing water temperature note: I used cold water from the fridge to mix this dough, mostly because my pre-cooked flour was not fully cool by the time I needed to mix. Be sure to take the temperature of the pre-cooked flour and other ingredients into account to get close to the final dough temperature listed for this recipe.</p><p class="line">To the bowl of a stand mixer fitted with the dough hook attachment, add the pre-cooked flour, flour, water, ripe levain, honey, olive oil, and salt. Mix on low speed for approximately <span class='timer' time='120.0'>2 minutes </span>until the ingredients come together, and no dry bits remain. Increase the mixer speed to medium (2 on a KitchenAid) and mix for <span class='timer' time='480.0'>8-10 minutes </span>until the dough starts to clump up around the dough hook. It won’t completely remove from the bottom of the bowl, and it will still be shaggy. See the image of my dough right after transferring to its bulk fermentation container.</p><p class="line">Transfer your dough to a bulk fermentation container and cover.</p><p class="line">Give this dough three sets of stretch and folds during bulk fermentation (first rise). For each set, wet your hands, grab one side and stretch it up and over the dough to the other side. Rotate the bowl 180° and perform another stretch and fold (this forms a long rectangle in the bowl). Then, rotate the bowl 90° and do another stretch and fold. Finally, rotate the bowl 180° and do one last stretch and fold. The dough should now be neatly folded up in the bowl.</p><p class="line">After the third set, let the dough rest for the remainder of bulk fermentation.</p><p class="line">Uncover your bulk fermentation container and gently scrape the dough out of the bowl onto a clean work surface. Using a bench knife, divide the dough directly in half and pre-shape each piece into a loose round. Let the rounds relax uncovered for <span class='timer' time='1800.0'>30 minutes</span>.</p><p class="line">First, lightly oil your Pullman pans with olive oil or another neutral oil. While this isn’t strictly necessary when using a USA Pan Pullman pan, it’s a little insurance just in case.</p><p class="line">I shaped this dough in my typical method for shaping a pan loaf. Check out my guide to shaping pan loaves for detailed instruction.</p><p class="line">Once the dough is shaped into a long tube, transfer each to their pan, seam-side-down. At this point, you can sprinkle on any toppings you’d like, I added white sesame seeds to one loaf, and instant oats to the other.</p><p class="line">Cover the pans with a large, reusable plastic bag and seal shut. Let the dough proof at room temperature, around 72-74°F (22-23°C), for <span class='timer' time='7200.0'>2 hours</span>.</p><p class="line">Overnight proof option: before the <span class='timer' time='7200.0'>2 hour </span>counter proof, cover the pans with bags and place them in your home refrigerator to proof overnight. Bake them the next morning as indicated below. Expect a slightly more sour flavor.</p><p class="line">Check on your dough: it should have risen just below the top of the Pullman pan and be very light and airy to the touch (see above). If it’s not quite there, give it another <span class='timer' time='900.0'>15 minutes </span>and check again.</p><p class="line">I steamed the oven for this bake as described on my post on baking with steam in a home oven.</p><p class="line">Preheat your oven, with rack at the bottom third run and a pan with lava rocks on the bottom, to 400°F (205°C).</p><p class="line">Once your oven is preheated, remove your proofed loaves from their bags and slide them into the oven. Carefully pour a cup of ice into the pan with lava rocks at the bottom of the oven and quickly close the oven door.</p><p class="line">Bake at 400°F (205°C) for <span class='timer' time='1200.0'>20 minutes </span>with steam. After this time, vent the oven, remove the steaming pan(s), and close the oven door. Bake for an additional <span class='timer' time='1800.0'>30-35 minutes </span>until the top is well-colored and the internal temp is around 205°F (96°C). Remove the pans and gently knock out the loaves onto a wire rack. Return the loaves to the oven to bake for an additional <span class='timer' time='300.0'>5 minutes </span>without their pans to add extra color to the bottom and sides.</p><p class="line">Let the loaves cool for <span class='timer' time='7200.0'>2 hours </span>before slicing to ensure the interior is fully set. These will store incredibly well as described in my post on how to store bread.</p>
+            <p class="line">To a medium saucepan, add the flour and milk listed above. Turn the heat to medium-low and cook, whisking continuously, until the mixture thickens and becomes like a paste, about 5-8 minutes. In the beginning, whisk vigorously to break up any flour clumps, and be diligent about this near the end to avoid burning. The mixture won’t seem to do anything until it reaches a critical heat point, be patient; it will thicken.</p><p class="line">Once it transforms into a viscous paste (something like oatmeal porridge), remove the pan from the heat and spread the paste out on a small plate to expedite cooling. Set aside until called for when mixing.</p><p class="line">I used my KitchenAid stand mixer to mix this dough, but it’s possible to make this bread without a stand mixer by mixing everything together by hand in a mixing bowl. To do this, you’ll need to mix for around 10-15 minutes, depending on your technique (slap and fold will work really well!).</p><p class="line">Mixing water temperature note: I used cold water from the fridge to mix this dough, mostly because my pre-cooked flour was not fully cool by the time I needed to mix. Be sure to take the temperature of the pre-cooked flour and other ingredients into account to get close to the final dough temperature listed for this recipe.</p><p class="line">To the bowl of a stand mixer fitted with the dough hook attachment, add the pre-cooked flour, flour, water, ripe levain, honey, olive oil, and salt. Mix on low speed for approximately 2 minutes until the ingredients come together, and no dry bits remain. Increase the mixer speed to medium (2 on a KitchenAid) and mix for 8-10 minutes until the dough starts to clump up around the dough hook. It won’t completely remove from the bottom of the bowl, and it will still be shaggy. See the image of my dough right after transferring to its bulk fermentation container.</p><p class="line">Transfer your dough to a bulk fermentation container and cover.</p><p class="line">Give this dough three sets of stretch and folds during bulk fermentation (first rise). For each set, wet your hands, grab one side and stretch it up and over the dough to the other side. Rotate the bowl 180° and perform another stretch and fold (this forms a long rectangle in the bowl). Then, rotate the bowl 90° and do another stretch and fold. Finally, rotate the bowl 180° and do one last stretch and fold. The dough should now be neatly folded up in the bowl.</p><p class="line">After the third set, let the dough rest for the remainder of bulk fermentation.</p><p class="line">Uncover your bulk fermentation container and gently scrape the dough out of the bowl onto a clean work surface. Using a bench knife, divide the dough directly in half and pre-shape each piece into a loose round. Let the rounds relax uncovered for 30 minutes.</p><p class="line">First, lightly oil your Pullman pans with olive oil or another neutral oil. While this isn’t strictly necessary when using a USA Pan Pullman pan, it’s a little insurance just in case.</p><p class="line">I shaped this dough in my typical method for shaping a pan loaf. Check out my guide to shaping pan loaves for detailed instruction.</p><p class="line">Once the dough is shaped into a long tube, transfer each to their pan, seam-side-down. At this point, you can sprinkle on any toppings you’d like, I added white sesame seeds to one loaf, and instant oats to the other.</p><p class="line">Cover the pans with a large, reusable plastic bag and seal shut. Let the dough proof at room temperature, around 72-74°F (22-23°C), for 2 hours.</p><p class="line">Overnight proof option: before the 2 hour counter proof, cover the pans with bags and place them in your home refrigerator to proof overnight. Bake them the next morning as indicated below. Expect a slightly more sour flavor.</p><p class="line">Check on your dough: it should have risen just below the top of the Pullman pan and be very light and airy to the touch (see above). If it’s not quite there, give it another 15 minutes and check again.</p><p class="line">I steamed the oven for this bake as described on my post on baking with steam in a home oven.</p><p class="line">Preheat your oven, with rack at the bottom third run and a pan with lava rocks on the bottom, to 400°F (205°C).</p><p class="line">Once your oven is preheated, remove your proofed loaves from their bags and slide them into the oven. Carefully pour a cup of ice into the pan with lava rocks at the bottom of the oven and quickly close the oven door.</p><p class="line">Bake at 400°F (205°C) for 20 minutes with steam. After this time, vent the oven, remove the steaming pan(s), and close the oven door. Bake for an additional 30-35 minutes until the top is well-colored and the internal temp is around 205°F (96°C). Remove the pans and gently knock out the loaves onto a wire rack. Return the loaves to the oven to bake for an additional 5 minutes without their pans to add extra color to the bottom and sides.</p><p class="line">Let the loaves cool for 2 hours before slicing to ensure the interior is fully set. These will store incredibly well as described in my post on how to store bread.</p>
         </div>
     </div>
     
@@ -177,84 +196,15 @@
 
     
     
-</div>
-
-        
-        <!-- PhotoSwipe gallery -->
-
-<link rel="stylesheet" href="Resources/PhotoSwipe/photoswipe.css">
-<link rel="stylesheet" href="Resources/PhotoSwipe/default-skin/default-skin.css">
-<script src="Resources/PhotoSwipe/photoswipe.min.js"></script>
-<script src="Resources/PhotoSwipe/photoswipe-ui-default.min.js"></script>
-
-<div class="pswp" tabindex="-1" role="dialog" aria-hidden="true">
-    <div class="pswp__bg"></div>
-    <div class="pswp__scroll-wrap">
-        <div class="pswp__container">
-            <div class="pswp__item"></div>
-            <div class="pswp__item"></div>
-            <div class="pswp__item"></div>
-        </div>
-        <div class="pswp__ui pswp__ui--hidden">
-            <div class="pswp__top-bar">
-                <div class="pswp__counter"></div>
-                <button class="pswp__button pswp__button--close" title="Close"></button>
-            </div>
-            <button class="pswp__button pswp__button--arrow--left" title="Previous">
-            </button>
-            <button class="pswp__button pswp__button--arrow--right" title="Next">
-            </button>
-            <div class="pswp__caption">
-                <div class="pswp__caption__center"></div>
-            </div>
-        </div>
     </div>
+    
+    <div class="clear"></div>
+
 </div>
 
-<script type="text/javascript">
-    var openPhotoSwipe = function(event) {
-        var pswp = document.querySelector('.pswp');
-        
-        var element = event.target;
-        var src = element.getAttribute('src');
-        
-        // build items array
-        var items = [
-            
-        ];
-        
-        var index = 0;
-        for (var i=0; i<items.length; i++) {
-            var item = items[i];
-            if (item.src == src) {
-                index = i;
-            }
-        }
-                         
-        var options = {
-            index: index,
-            history: false,
-            focus: true,
-            captionEl: true,
-            fullscreenEl: false,
-            zoomEl: false,
-            shareEl: false,
-            preloaderEl: false,
-            bgOpacity: 0.9,
-            showHideOpacity: true
-        };
-                             
-        var gallery = new PhotoSwipe(pswp, PhotoSwipeUI_Default, items, options);
-        gallery.init();
-    };
 
-    var elements = document.querySelectorAll('.photoswipe');
-    for (var i=0; i<elements.length; i++) {
-        var element = elements[i];
-        element.addEventListener('click', openPhotoSwipe);
-    }
-</script>
 
-        
+
+
     </body>
 </html>
