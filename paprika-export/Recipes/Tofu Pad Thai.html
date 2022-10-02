@@ -110,7 +110,7 @@
         
         <div class="photobox">
             
-            <a href="https://meals-of-change-production.s3.eu-west-2.amazonaws.com/photos/recipes/large/e991991e-2858-487d-a265-ee6b6e3951ea?response-content-disposition=inline%3B%20filename%3D%222B6C62B0-246A-4963-A2AE-4C0649470A04.JPEG%22%3B%20filename%2A%3DUTF-8%27%272B6C62B0-246A-4963-A2AE-4C0649470A04.JPEG&response-content-type=image%2Fjpeg&X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Credential=AKIA6M6S5WT5R4IHSWGM%2F20220128%2Feu-west-2%2Fs3%2Faws4_request&X-Amz-Date=20220128T175522Z&X-Amz-Expires=86400&X-Amz-SignedHeaders=host&X-Amz-Signature=e1b72683e3d411340c6b90378c9a1016e2fe1d16f4bc6e7b43374f35d38530f7">
+            <a href="#">
                 <img src="Images/CB7C018A-AB58-44EB-BE3B-3FB3A8E2BAEF/C117EA38-9B79-444C-99AA-9930B7245146.jpg" itemprop="image" class="photo photoswipe"/>
             </a>
             
@@ -161,7 +161,7 @@
         <div class="ingredientsbox">
             <h3 class="subhead">Ingredients</h3>
             <div class="ingredients text">
-                <p class="line" itemprop="recipeIngredient"><strong>200</strong>g Rice noodles</p><p class="line" itemprop="recipeIngredient"><strong>220</strong>g Extra firm tofu</p><p class="line" itemprop="recipeIngredient"><strong>1</strong> tbsp Sesame oil</p><p class="line" itemprop="recipeIngredient"><strong>42</strong>g Bean sprouts</p><p class="line" itemprop="recipeIngredient"><strong>3</strong> tbsp Tamarind paste</p><p class="line" itemprop="recipeIngredient"><strong>3</strong> tbsp Brown sugar</p><p class="line" itemprop="recipeIngredient"><strong>1</strong> tsp Red curry paste</p><p class="line" itemprop="recipeIngredient"><strong>2</strong> tbsp Soy sauce</p><p class="line" itemprop="recipeIngredient"><strong>60</strong>ml Vegetable stock</p><p class="line" itemprop="recipeIngredient"><strong>1</strong> Lime (optional)</p>
+                <p class="line" itemprop="recipeIngredient"><strong>200</strong>g Rice noodles</p><p class="line" itemprop="recipeIngredient"><strong>220</strong>g Extra firm tofu</p><p class="line" itemprop="recipeIngredient"><strong>1</strong> tbsp Sesame oil</p><p class="line" itemprop="recipeIngredient"><strong>42</strong>g Bean sprouts</p><p class="line" itemprop="recipeIngredient"><strong>3</strong> tbsp Tamarind paste</p><p class="line" itemprop="recipeIngredient"><strong>3</strong> tbsp Brown sugar</p><p class="line" itemprop="recipeIngredient"><strong>1</strong> tsp Red curry paste</p><p class="line" itemprop="recipeIngredient"><strong>2</strong> tbsp Soy sauce</p><p class="line" itemprop="recipeIngredient"><strong>60</strong>ml Vegetable stock</p><p class="line" itemprop="recipeIngredient"><strong>1/2</strong> Onion</p><p class="line" itemprop="recipeIngredient"><strong>1</strong> Red pepper, sliced into strips</p><p class="line" itemprop="recipeIngredient"><strong>1</strong> Carrot, sliced into strips</p><p class="line" itemprop="recipeIngredient"><strong>2</strong> cloves Garlic, minced</p><p class="line" itemprop="recipeIngredient"><strong>75</strong>g Peanuts (optional), crushed</p><p class="line" itemprop="recipeIngredient">Fresh coriander (optional)</p><p class="line" itemprop="recipeIngredient"><strong>1</strong> Lime (optional)</p>
             </div>
         </div>
         
@@ -201,6 +201,83 @@
     <div class="clear"></div>
 
 </div>
+
+
+<!-- Photo gallery is only included when exporting. -->
+<!-- PhotoSwipe gallery -->
+
+<link rel="stylesheet" href="Resources/PhotoSwipe/photoswipe.css">
+<link rel="stylesheet" href="Resources/PhotoSwipe/default-skin/default-skin.css">
+<script src="Resources/PhotoSwipe/photoswipe.min.js"></script>
+<script src="Resources/PhotoSwipe/photoswipe-ui-default.min.js"></script>
+
+<div class="pswp" tabindex="-1" role="dialog" aria-hidden="true">
+    <div class="pswp__bg"></div>
+    <div class="pswp__scroll-wrap">
+        <div class="pswp__container">
+            <div class="pswp__item"></div>
+            <div class="pswp__item"></div>
+            <div class="pswp__item"></div>
+        </div>
+        <div class="pswp__ui pswp__ui--hidden">
+            <div class="pswp__top-bar">
+                <div class="pswp__counter"></div>
+                <button class="pswp__button pswp__button--close" title="Close"></button>
+            </div>
+            <button class="pswp__button pswp__button--arrow--left" title="Previous">
+            </button>
+            <button class="pswp__button pswp__button--arrow--right" title="Next">
+            </button>
+            <div class="pswp__caption">
+                <div class="pswp__caption__center"></div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script type="text/javascript">
+    var openPhotoSwipe = function(event) {
+        var pswp = document.querySelector('.pswp');
+        
+        var element = event.target;
+        var src = element.getAttribute('src');
+        
+        // build items array
+        var items = [
+            
+        ];
+        
+        var index = 0;
+        for (var i=0; i<items.length; i++) {
+            var item = items[i];
+            if (item.src == src) {
+                index = i;
+            }
+        }
+                         
+        var options = {
+            index: index,
+            history: false,
+            focus: true,
+            captionEl: true,
+            fullscreenEl: false,
+            zoomEl: false,
+            shareEl: false,
+            preloaderEl: false,
+            bgOpacity: 0.9,
+            showHideOpacity: true
+        };
+                             
+        var gallery = new PhotoSwipe(pswp, PhotoSwipeUI_Default, items, options);
+        gallery.init();
+    };
+
+    var elements = document.querySelectorAll('.photoswipe');
+    for (var i=0; i<elements.length; i++) {
+        var element = elements[i];
+        element.addEventListener('click', openPhotoSwipe);
+    }
+</script>
 
 
 
