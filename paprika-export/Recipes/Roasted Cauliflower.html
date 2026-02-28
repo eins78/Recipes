@@ -9,6 +9,11 @@
                 font-size: 16.0px;
                 color: #34302e;
                 margin: 0.25in;
+                min-width: 1024px;
+            }
+            @page {
+                size: letter portrait;
+                margin: 0.25in;
             }
             .name {
                 font-size: 18.0px;
@@ -110,8 +115,8 @@
         
         <div class="photobox">
             
-            <a href="https://static01.nyt.com/images/2015/10/15/dining/15COOKING-CAULIFLOWER1/15COOKING-CAULIFLOWER-articleLarge.jpg">
-                <img src="Images/AC5FE94B-FD8F-4FFC-9543-47A6B9AAC655/9123B914-C911-4313-9B7E-50ACDF7FF529.jpg" itemprop="image" class="photo photoswipe"/>
+            <a href="#">
+                <img src="Images/AC5FE94B-FD8F-4FFC-9543-47A6B9AAC655/98BFE0D8-1E29-4E0E-9187-ED6B5A4AF605.jpg" itemprop="image" class="photo photoswipe"/>
             </a>
             
             
@@ -223,6 +228,91 @@
     <div class="clear"></div>
 
 </div>
+
+
+<!-- Photo gallery is only included when exporting. -->
+<!-- PhotoSwipe gallery -->
+
+<link rel="stylesheet" href="Resources/PhotoSwipe/photoswipe.css">
+<link rel="stylesheet" href="Resources/PhotoSwipe/default-skin/default-skin.css">
+<script src="Resources/PhotoSwipe/photoswipe.min.js"></script>
+<script src="Resources/PhotoSwipe/photoswipe-ui-default.min.js"></script>
+
+<div class="pswp" tabindex="-1" role="dialog" aria-hidden="true">
+    <div class="pswp__bg"></div>
+    <div class="pswp__scroll-wrap">
+        <div class="pswp__container">
+            <div class="pswp__item"></div>
+            <div class="pswp__item"></div>
+            <div class="pswp__item"></div>
+        </div>
+        <div class="pswp__ui pswp__ui--hidden">
+            <div class="pswp__top-bar">
+                <div class="pswp__counter"></div>
+                <button class="pswp__button pswp__button--close" title="Close"></button>
+            </div>
+            <button class="pswp__button pswp__button--arrow--left" title="Previous">
+            </button>
+            <button class="pswp__button pswp__button--arrow--right" title="Next">
+            </button>
+            <div class="pswp__caption">
+                <div class="pswp__caption__center"></div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script type="text/javascript">
+    var openPhotoSwipe = function(event) {
+        var pswp = document.querySelector('.pswp');
+        
+        var element = event.target;
+        var src = element.getAttribute('src');
+        
+        // build items array
+        var items = [
+            
+            {
+                msrc: 'Images/AC5FE94B-FD8F-4FFC-9543-47A6B9AAC655/6468E781-8521-4299-88C8-70B87151DEEF.jpg',
+                src: 'Images/AC5FE94B-FD8F-4FFC-9543-47A6B9AAC655/6468E781-8521-4299-88C8-70B87151DEEF.jpg',
+                w: 600.0,
+                h: 400.0,
+                title: '1'
+            },
+            
+        ];
+        
+        var index = 0;
+        for (var i=0; i<items.length; i++) {
+            var item = items[i];
+            if (item.src == src) {
+                index = i;
+            }
+        }
+                         
+        var options = {
+            index: index,
+            history: false,
+            focus: true,
+            captionEl: true,
+            fullscreenEl: false,
+            zoomEl: false,
+            shareEl: false,
+            preloaderEl: false,
+            bgOpacity: 0.9,
+            showHideOpacity: true
+        };
+                             
+        var gallery = new PhotoSwipe(pswp, PhotoSwipeUI_Default, items, options);
+        gallery.init();
+    };
+
+    var elements = document.querySelectorAll('.photoswipe');
+    for (var i=0; i<elements.length; i++) {
+        var element = elements[i];
+        element.addEventListener('click', openPhotoSwipe);
+    }
+</script>
 
 
 
