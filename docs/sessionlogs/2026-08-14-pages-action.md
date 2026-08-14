@@ -116,9 +116,34 @@ overflow, all tagged.
 Max's read was right — the viewport tag alone is sufficient. The pages are linear
 documents; they reflow cleanly at 390px with no CSS changes.
 
-Still to confirm after the first deploy: that `actions/jekyll-build-pages` reproduces
-`/Recipes/` with the correct `/Recipes/` base path for its theme CSS. The PR build
-uploads an artifact without deploying, so this can be checked before anything ships.
+### What the PR build caught that local runs could not
+
+Three things, all found before anything deployed — the PR build uploads an artifact
+without deploying:
+
+1. **`EACCES` on the first write.** `jekyll-build-pages` runs in a container as root,
+   so `_site` came back root-owned. Fixed by taking ownership before post-processing.
+2. **The action versions were several majors behind** (checkout v4→v7, setup-node
+   v4→v7, configure-pages v5→v6, upload-pages-artifact v3→v5, deploy-pages v4→v5);
+   the runner was warning about forced Node 20→24. Inputs unchanged across those
+   majors.
+3. **Jekyll published the build tooling.** The artifact contained `tools/`,
+   `package.json` and `docs/` — including this sessionlog rendered into a public HTML
+   page. Fixed with a `_config.yml` `exclude:` list.
+
+### Artifact inspection (the exact bytes that would deploy)
+
+- 249 pages, every one with exactly one viewport meta; 288 images intact
+- `248 injected, 2 skipped` — the 2 are Jekyll's own generated pages, which already
+  carry a viewport from the theme. The skip rule earns its keep here.
+- **Base path confirmed:** the landing page references
+  `/Recipes/assets/css/style.css`, matching the live site. This was the one risk not
+  verifiable locally.
+- Diffed against the live landing page: identical apart from `http://` → `https://`
+  in the canonical and og URLs, because `https_enforced` flipped when Pages moved to
+  Actions. The new build is the more correct one.
+- Re-checked under mobile emulation against the artifact: 8 pages, no overflow, all
+  tagged, all images loading.
 
 ## Deferred
 
