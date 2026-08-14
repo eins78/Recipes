@@ -1,0 +1,6 @@
+node_modules/
+_site/
+.jekyll-cache/
+.jekyll-metadata
+.playwright-mcp/
+.DS_Store
