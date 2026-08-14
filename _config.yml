@@ -1,0 +1,18 @@
+# Jekyll builds from the repository root, so without this it publishes the build
+# tooling and the sessionlogs alongside the recipes — and renders the sessionlog
+# markdown into a public page. Only the export and the README-derived landing
+# page should ship.
+#
+# Setting `exclude` replaces Jekyll's default list rather than adding to it, so
+# the defaults worth keeping are repeated here.
+exclude:
+  - .sass-cache/
+  - .jekyll-cache/
+  - gemfiles/
+  - Gemfile
+  - Gemfile.lock
+  - node_modules/
+  - vendor/
+  - docs/
+  - tools/
+  - package.json
