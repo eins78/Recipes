@@ -27,9 +27,9 @@ jobs:
     permissions:
       contents: read
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
 
-      - uses: actions/setup-node@v4
+      - uses: actions/setup-node@v7
         with:
           node-version: "24"
 
@@ -38,7 +38,7 @@ jobs:
       - name: Run tests
         run: npm test
 
-      - uses: actions/configure-pages@v5
+      - uses: actions/configure-pages@v6
 
       # The same builder the legacy branch build used, so /Recipes/ (the README
       # rendered by Jekyll's default theme) keeps working exactly as before.
@@ -47,6 +47,11 @@ jobs:
         with:
           source: ./
           destination: ./_site
+
+      # jekyll-build-pages runs in a container as root, so _site comes back
+      # owned by root and the runner user cannot write into it.
+      - name: Take ownership of the build output
+        run: sudo chown -R "$(id -u):$(id -g)" _site
 
       - name: Inject viewport meta
         run: node tools/inject-viewport.ts _site
@@ -64,7 +69,7 @@ jobs:
             exit 1
           fi
 
-      - uses: actions/upload-pages-artifact@v3
+      - uses: actions/upload-pages-artifact@v5
         with:
           path: ./_site
 
@@ -81,4 +86,4 @@ jobs:
       url: ${{ steps.deployment.outputs.page_url }}
     steps:
       - id: deployment
-        uses: actions/deploy-pages@v4
+        uses: actions/deploy-pages@v5
