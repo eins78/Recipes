@@ -74,8 +74,10 @@ jobs:
           path: ./_site
 
   # Pull requests build and upload an artifact for inspection, but never deploy.
+  # The ref guard matters for workflow_dispatch: without it, dispatching from any
+  # branch would publish that branch's build to the live site.
   deploy:
-    if: github.event_name != 'pull_request'
+    if: github.event_name != 'pull_request' && github.ref == 'refs/heads/master'
     needs: build
     runs-on: ubuntu-latest
     permissions:
