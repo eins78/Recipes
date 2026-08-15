@@ -1,0 +1,89 @@
+name: Build and deploy Pages
+
+# Pages is set to "GitHub Actions" as its source, so this workflow is the only
+# thing that publishes https://code.178.is/Recipes/.
+#
+# Deliberately no `paths:` filter — every file in the repo is an input to the
+# Jekyll build (README.md becomes the /Recipes/ landing page), so filtering
+# could only ever produce a stale deploy.
+on:
+  push:
+    branches: [master]
+  pull_request:
+  workflow_dispatch:
+
+# Least privilege: permissions are granted per job, not workflow-wide. The build
+# job reads the repo and nothing else; only deploy can publish.
+permissions: {}
+
+# Never cancel a half-finished deploy.
+concurrency:
+  group: pages
+  cancel-in-progress: false
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@v7
+
+      - uses: actions/setup-node@v7
+        with:
+          node-version: "24"
+
+      # No dependencies to install: the tools are TypeScript run directly by
+      # Node's native type stripping, tested with Node's built-in test runner.
+      - name: Run tests
+        run: npm test
+
+      - uses: actions/configure-pages@v6
+
+      # Copies the export and writes the generated index at both the site root
+      # and paprika-export/index.html. This replaced Jekyll: its only remaining
+      # job was rendering README.md into the landing page, and the generated
+      # index now holds that slot. Dropping it also removed the container step
+      # and the `sudo chown` that existed only because it ran as root.
+      #
+      # Runs before injection: the generated pages carry their own viewport
+      # meta, so the injector skips them.
+      - name: Build the site
+        run: node tools/build-site.ts . _site
+
+      - name: Inject viewport meta
+        run: node tools/inject-viewport.ts _site
+
+      - name: Verify built site
+        run: node tools/verify-site.ts . _site
+
+      # paprika-export/ is read-only input: it is regenerated wholesale from the
+      # Paprika app, so anything written there would be silently lost.
+      - name: Assert the export was not modified
+        run: |
+          if [ -n "$(git status --porcelain -- paprika-export)" ]; then
+            echo "::error::the build modified paprika-export/, which must be read-only input"
+            git status --porcelain -- paprika-export
+            exit 1
+          fi
+
+      - uses: actions/upload-pages-artifact@v5
+        with:
+          path: ./_site
+
+  # Pull requests build and upload an artifact for inspection, but never deploy.
+  # The ref guard matters for workflow_dispatch: without it, dispatching from any
+  # branch would publish that branch's build to the live site.
+  deploy:
+    if: github.event_name != 'pull_request' && github.ref == 'refs/heads/master'
+    needs: build
+    runs-on: ubuntu-latest
+    permissions:
+      pages: write
+      id-token: write
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - id: deployment
+        uses: actions/deploy-pages@v5
