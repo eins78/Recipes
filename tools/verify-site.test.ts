@@ -10,6 +10,12 @@ const HEBREW_RECIPE = "Grilled Eggplant Salad (‎חצילים ‎סלט).html";
 
 const PAGE_WITH_VIEWPORT =
   '<html><head><meta name="viewport" content="width=device-width, initial-scale=1"><meta charset="UTF-8"></head><body>x</body></html>';
+
+/** A generated index must link every recipe page. */
+const indexLinking = (files: readonly string[]): string =>
+  `<html><head><meta name="viewport" content="width=device-width, initial-scale=1"></head><body><ul>${files
+    .map((f) => `<li><a href="Recipes/${encodeURIComponent(f)}">${f}</a></li>`)
+    .join("")}</ul></body></html>`;
 const PAGE_WITHOUT_VIEWPORT = "<html><head><meta charset=\"UTF-8\"></head><body>x</body></html>";
 
 /**
@@ -31,6 +37,11 @@ async function makePair(): Promise<{ repoRoot: string; siteRoot: string }> {
   }
   // The repo's own copies are the pristine export, without a viewport.
   await writeFile(join(repoRoot, "paprika-export", "index.html"), PAGE_WITHOUT_VIEWPORT);
+  // The built index is the generated one, linking every recipe.
+  await writeFile(
+    join(siteRoot, "paprika-export", "index.html"),
+    indexLinking(["Älplermagronen.html", HEBREW_RECIPE]),
+  );
 
   return { repoRoot, siteRoot };
 }
@@ -116,6 +127,27 @@ describe("verifySite", () => {
         }),
       /Never Existed/,
     );
+  });
+
+  test("fails when the generated index does not link every recipe", async () => {
+    const { repoRoot, siteRoot } = await makePair();
+    await writeFile(
+      join(siteRoot, "paprika-export", "index.html"),
+      indexLinking([HEBREW_RECIPE]), // Älplermagronen dropped
+    );
+
+    await assert.rejects(
+      () => verifySite({ repoRoot, siteRoot, canaries }),
+      /index[\s\S]*Älplermagronen/,
+    );
+  });
+
+  test("accepts an index whose hrefs are percent-encoded", async () => {
+    const { repoRoot, siteRoot } = await makePair();
+
+    const report = await verifySite({ repoRoot, siteRoot, canaries });
+
+    assert.equal(report.htmlChecked, 3);
   });
 
   test("reports every problem at once, not just the first", async () => {

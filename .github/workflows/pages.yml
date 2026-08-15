@@ -53,6 +53,12 @@ jobs:
       - name: Take ownership of the build output
         run: sudo chown -R "$(id -u):$(id -g)" _site
 
+      # Replaces Paprika's flat alphabetical list with a generated index that
+      # has lists by category. Runs before injection: the generated page carries
+      # its own viewport meta, so the injector skips it.
+      - name: Build the recipe index
+        run: node tools/build-index.ts _site
+
       - name: Inject viewport meta
         run: node tools/inject-viewport.ts _site
 
