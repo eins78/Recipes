@@ -96,22 +96,33 @@ export async function verifySite(options: VerifyOptions): Promise<VerifyReport> 
     problems.push(`image count differs: export has ${exportImages}, site has ${siteImages}`);
   }
 
-  // 4. The generated index reaches every recipe. Without this, a parser change
-  //    could quietly ship an index that lists half the library.
-  const indexPath = join(siteRoot, EXPORT_DIR, "index.html");
-  const linked = new Set(
-    [...(await readFile(indexPath, "utf8")).matchAll(/href="Recipes\/([^"]+)"/g)].map((m) =>
-      decodeURIComponent(m[1]).normalize("NFC"),
-    ),
-  );
-  const unlinked = sorted(exportHtml)
+  // 4. Both generated index pages reach every recipe: the landing page at the
+  //    site root and the in-the-wild paprika-export/index.html. Without this, a
+  //    parser change could quietly ship an index listing half the library.
+  const recipeFiles = sorted(exportHtml)
     .filter((f) => f.startsWith("Recipes/"))
     .map((f) => f.slice("Recipes/".length))
-    .filter((f) => !f.includes("/") && !linked.has(f));
-  if (unlinked.length > 0) {
-    problems.push(
-      `${unlinked.length} recipe(s) not linked from the generated index:\n  ${unlinked.join("\n  ")}`,
+    .filter((f) => !f.includes("/"));
+
+  for (const [page, prefix] of [
+    ["index.html", `${EXPORT_DIR}/`],
+    [join(EXPORT_DIR, "index.html"), ""],
+  ] as const) {
+    const html = await readFile(join(siteRoot, page), "utf8").catch(() => null);
+    if (html === null) {
+      problems.push(`${page} is missing from the built site`);
+      continue;
+    }
+    const pattern = new RegExp(`href="${prefix}Recipes/([^"]+)"`, "g");
+    const linked = new Set(
+      [...html.matchAll(pattern)].map((m) => decodeURIComponent(m[1]).normalize("NFC")),
     );
+    const unlinked = recipeFiles.filter((f) => !linked.has(f));
+    if (unlinked.length > 0) {
+      problems.push(
+        `${unlinked.length} recipe(s) not linked from ${page}:\n  ${unlinked.join("\n  ")}`,
+      );
+    }
   }
 
   // 5. Canary paths — unicode and bidi marks made it through intact.

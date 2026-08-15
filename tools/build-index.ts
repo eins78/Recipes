@@ -78,6 +78,18 @@ export function parseRecipe(html: string, file: string): Recipe {
   };
 }
 
+/**
+ * Curation tags display without their leading underscore: "_Proven" reads
+ * "Proven". The underscore stays in the source data — it is what distinguishes a
+ * curation tag from a cuisine — so stripping it is a display concern only.
+ * Because the character no longer carries the distinction visually, curated
+ * chips get their own class and are sorted first explicitly.
+ */
+export const displayName = (category: string): string =>
+  category.startsWith(CURATION_PREFIX) ? category.slice(CURATION_PREFIX.length) : category;
+
+const isCurated = (category: string): boolean => category.startsWith(CURATION_PREFIX);
+
 export const slugFor = (category: string): string =>
   category
     .toLowerCase()
@@ -129,20 +141,30 @@ export function group(recipes: readonly Recipe[]): Grouped {
   };
 }
 
-const href = (recipe: Recipe): string => `Recipes/${encodeURIComponent(recipe.file)}`;
+const href = (recipe: Recipe, prefix: string): string =>
+  `${prefix}Recipes/${encodeURIComponent(recipe.file)}`;
 
-const renderRecipe = (recipe: Recipe, context?: string): string => {
-  const others = recipe.categories.filter((c) => c !== context);
+/** Curation tags lead, then cuisines alphabetically — explicit, not incidental. */
+const chipOrder = (a: string, b: string): number =>
+  Number(isCurated(b)) - Number(isCurated(a)) || collator.compare(a, b);
+
+const renderRecipe = (recipe: Recipe, prefix: string, context?: string): string => {
+  const others = [...recipe.categories].filter((c) => c !== context).sort(chipOrder);
   const tags =
     others.length === 0
       ? ""
-      : ` <span class="tags">${others.map((c) => `<span class="tag">${escapeHtml(c)}</span>`).join("")}</span>`;
-  return `<li><a href="${href(recipe)}">${escapeHtml(recipe.name)}</a>${tags}</li>`;
+      : ` <span class="tags">${others
+          .map(
+            (c) =>
+              `<span class="tag${isCurated(c) ? " curated" : ""}">${escapeHtml(displayName(c))}</span>`,
+          )
+          .join("")}</span>`;
+  return `<li><a href="${href(recipe, prefix)}">${escapeHtml(recipe.name)}</a>${tags}</li>`;
 };
 
 const renderGroup = (g: CategoryGroup, open: boolean, items: string): string => `
 <details id="${g.slug}"${open ? " open" : ""}>
-  <summary>${escapeHtml(g.name)} <span class="count">${g.recipes.length}</span></summary>
+  <summary>${escapeHtml(displayName(g.name))} <span class="count">${g.recipes.length}</span></summary>
   <ul>${items}</ul>
 </details>`;
 
@@ -180,6 +202,8 @@ li a { display: inline-block; min-height: 1.5rem; }
   vertical-align: middle; }
 .tag { font-size: .6875rem; color: var(--muted); background: var(--chip);
   padding: .1rem .4rem; border-radius: .75rem; white-space: nowrap; }
+.tag.curated { color: var(--accent); background: transparent;
+  box-shadow: inset 0 0 0 1px currentColor; }
 .empty { color: var(--muted); font-style: italic; padding: 1rem .25rem; }
 footer { margin-top: 3rem; color: var(--muted); font-size: .8125rem; }
 `;
@@ -205,7 +229,45 @@ q.addEventListener('input', () => {
 });
 `;
 
-export function renderIndex(recipes: readonly Recipe[]): string {
+/**
+ * Renders the README's prose for the page footer, so the repository's own
+ * description stays reachable now that the index has replaced it as the landing
+ * page. Handles only what the README actually contains: paragraphs and inline
+ * `[text](url)` links. The H1 is dropped (the page has its own) and so is the
+ * sentence pointing at the index, which would now point at itself.
+ */
+export function renderReadme(markdown: string): string {
+  return markdown
+    .split(/\n\s*\n/)
+    .map((block) => block.trim())
+    .filter((block) => block !== "" && !block.startsWith("#"))
+    .filter((block) => !block.includes("paprika-export/index.html"))
+    .map((block) => {
+      const parts: string[] = [];
+      let at = 0;
+      for (const link of block.matchAll(/\[([^\]]+)\]\(([^)\s]+)\)/g)) {
+        parts.push(escapeHtml(block.slice(at, link.index)));
+        parts.push(`<a href="${escapeHtml(link[2])}">${escapeHtml(link[1])}</a>`);
+        at = link.index + link[0].length;
+      }
+      parts.push(escapeHtml(block.slice(at)));
+      return `<p>${parts.join("").replace(/\n/g, " ")}</p>`;
+    })
+    .join("\n");
+}
+
+export interface RenderOptions {
+  /** Prepended to every recipe href, e.g. "paprika-export/" at the site root. */
+  readonly linkPrefix?: string;
+  /** README markdown, folded into the footer. */
+  readonly readme?: string;
+}
+
+export function renderIndex(
+  recipes: readonly Recipe[],
+  options: RenderOptions = {},
+): string {
+  const prefix = options.linkPrefix ?? "";
   const g = group(recipes);
   const categorised = recipes.length - g.uncategorised.length;
   const categoryCount = g.curated.length + g.regular.length;
@@ -219,7 +281,7 @@ export function renderIndex(recipes: readonly Recipe[]): string {
     );
 
   const list = (rs: readonly Recipe[], context?: string): string =>
-    rs.map((r) => withSearchData(renderRecipe(r, context), r)).join("");
+    rs.map((r) => withSearchData(renderRecipe(r, prefix, context), r)).join("");
 
   const groupHtml = (gr: CategoryGroup, open: boolean): string =>
     renderGroup(gr, open, list(gr.recipes, gr.name));
@@ -259,15 +321,30 @@ ${g.regular.map((gr) => groupHtml(gr, false)).join("\n")}
 <ul>${list([...recipes].sort(byName))}</ul>
 </section>
 
-<footer>Generated from the Paprika export. <a href="../">Back to the repository page</a>.</footer>
+<footer>
+${options.readme === undefined ? "" : renderReadme(options.readme)}
+<p>This index is generated from the export by the Pages workflow.</p>
+</footer>
 <script>${SCRIPT}</script>
 </body>
 </html>
 `;
 }
 
-/** Reads every recipe page under the built site and rewrites its index. */
-export async function buildIndex(siteRoot: string): Promise<{ recipes: number }> {
+export interface IndexTarget extends RenderOptions {
+  /** Where to write, relative to the site root. */
+  readonly path: string;
+}
+
+const DEFAULT_TARGETS: readonly IndexTarget[] = [
+  { path: join("paprika-export", "index.html"), linkPrefix: "" },
+];
+
+/** Reads every recipe page under the built site and writes the index page(s). */
+export async function buildIndex(
+  siteRoot: string,
+  targets: readonly IndexTarget[] = DEFAULT_TARGETS,
+): Promise<{ recipes: number }> {
   const recipesDir = join(siteRoot, "paprika-export", "Recipes");
   const recipes: Recipe[] = [];
 
@@ -281,11 +358,9 @@ export async function buildIndex(siteRoot: string): Promise<{ recipes: number }>
     throw new Error(`no recipe pages found under ${recipesDir}`);
   }
 
-  await writeFile(
-    join(siteRoot, "paprika-export", "index.html"),
-    renderIndex(recipes),
-    "utf8",
-  );
+  for (const target of targets) {
+    await writeFile(join(siteRoot, target.path), renderIndex(recipes, target), "utf8");
+  }
   return { recipes: recipes.length };
 }
 

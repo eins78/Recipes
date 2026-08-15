@@ -67,22 +67,79 @@ a ~31 MB page and would undo phase 1. The generated page is 145 KB uncompressed.
 box is progressive enhancement: with JS off, every recipe is still listed and linked.
 Filtering matches name *and* category, so typing "swiss" works from the flat list too.
 
-## Fork taken
+## Review round: index at the root, and Jekyll removed
 
-Whether to also replace the Jekyll README page at `/Recipes/` with this index. Not
-done: that was the phase-2 landing-page question Max deferred, and it is a separate
-decision from the one he asked for. `/Recipes/` still shows the README, which links to
-the index. Named in the PR.
+Max on the PR: *"why don't we just render out index at the root? also curation tags
+are handled correctly but should be displayed without the underscore."*
+
+That answered the fork above. `/Recipes/` is now the generated index.
+
+### Jekyll is gone
+
+Checked before cutting. Jekyll's only remaining job was rendering `README.md` into
+the landing page, plus supplying that page's theme CSS. The repo has no layouts, no
+includes, no front matter anywhere, no other markdown that shipped (`docs/` was
+excluded), and no 404 page. `_config.yml` existed *solely* to stop Jekyll publishing
+the build tooling.
+
+So removing it was small, and it improved the shape: `build-site.ts` copies
+`paprika-export/` and nothing else — an **allowlist**, where the previous
+`_config.yml` was a denylist that published `tools/`, `package.json` and a sessionlog
+the first time it was missing an entry.
+
+Dropping Jekyll also removed the container step and the `sudo chown -R` that existed
+only because `jekyll-build-pages` runs as root. The build is now one Node pass:
+
+```
+build-site → inject-viewport → verify-site
+```
+
+The index is written **twice**: at the site root, and at
+`paprika-export/index.html`, whose URL is in the wild. Same content, different link
+depth via a `linkPrefix`.
+
+**The README is folded into the page footer**, rendered from `README.md` at build time
+so it cannot drift — paragraphs and inline links only, which is all it contains. The
+heading is dropped (the page has its own) and so is the "see the index" sentence,
+which would now point at itself.
+
+One URL changes: `/Recipes/README.md` (the raw markdown, which Jekyll copied through
+incidentally) is no longer published. Its content is in the footer. Flagged in the PR
+rather than assumed to be fine.
+
+### Curation tags display without the underscore
+
+`_Proven` → "Proven", `_Mealprep` → "Mealprep", `_Sourdough` → "Sourdough". Display
+only: the underscore stays in the source data and is still exactly what distinguishes
+a curation tag from a cuisine.
+
+Because the character no longer carries the distinction visually, two things became
+explicit rather than incidental:
+
+- curated chips get their own class and an outlined accent style
+- chips sort curation-first through an explicit comparator, not by relying on `_`
+  sorting ahead of letters in ASCII
+
+A test pins the second one: `Fall/Winter` sorts before `Proven` alphabetically, so if
+the chips came out alphabetically the curation tag would no longer lead.
+
+That test initially failed for the wrong reason — I asserted on the first chip in the
+whole document, which comes from the Collections section where the curation tag *is*
+the current context and is correctly filtered out of its own chips. The assertion
+moved to the A-Z section, where nothing is filtered.
 
 ## Verification
 
-Local, against the real 247-recipe export:
+Local, against the real 247-recipe export, after Jekyll was removed:
 
 ```
-index: built from 247 recipe page(s)
-viewport: injected into 247 page(s), skipped 1 already carrying one
-verified: 248 page(s) each with one viewport meta, 288 image(s) intact
+site: assembled from 247 recipe page(s)
+viewport: injected into 247 page(s), skipped 2 already carrying one
+verified: 249 page(s) each with one viewport meta, 288 image(s) intact
 ```
+
+The 2 skipped are the two generated index pages, which carry their own viewport meta.
+`_site/` now contains exactly `index.html` and `paprika-export/` — nothing else.
 
 Generated header line reads `247 recipes · 118 across 32 categories · 129
 uncategorised`, matching the independent shell measurements above. 662 list items,
@@ -98,9 +155,22 @@ Under mobile emulation at 390×844:
 - following a link out of the Swiss category resolves 200
 - no console errors, no failed requests
 
-New fail-loudly check in `verify-site.ts`: every recipe page must be linked from the
-generated index, comparing percent-decoded hrefs against the file set. Without it, a
-parser regression could ship an index listing half the library and still pass.
+New fail-loudly check in `verify-site.ts`: every recipe page must be linked from
+**both** generated index pages — the root landing page and
+`paprika-export/index.html` — comparing percent-decoded hrefs against the file set,
+each with its own link prefix. Without it, a parser regression could ship an index
+listing half the library and still pass.
+
+Re-verified after the root/underscore round, at 390×844 on both pages:
+
+- root and `paprika-export/index.html`: 390/390, widest element 374px, no overflow
+- 247 distinct recipe hrefs from each, 32 category sections, 0 tap targets under 24px
+- no underscore appears anywhere in the rendered text; curated chips read Proven,
+  Mealprep, Sourdough; the `#proven` summary reads "Proven 71"
+- following a link from the **root** page — where the `paprika-export/` prefix is what
+  could break — resolves 200, and the recipe page is still 390/390 with its viewport
+  meta and its image loading
+- no page errors, no failed requests
 
 ## Notes
 
