@@ -10,6 +10,12 @@ const HEBREW_RECIPE = "Grilled Eggplant Salad (‎חצילים ‎סלט).html";
 
 const PAGE_WITH_VIEWPORT =
   '<html><head><meta name="viewport" content="width=device-width, initial-scale=1"><meta charset="UTF-8"></head><body>x</body></html>';
+
+/** A generated index must link every recipe page. */
+const indexLinking = (files: readonly string[], prefix = ""): string =>
+  `<html><head><meta name="viewport" content="width=device-width, initial-scale=1"></head><body><ul>${files
+    .map((f) => `<li><a href="${prefix}Recipes/${encodeURIComponent(f)}">${f}</a></li>`)
+    .join("")}</ul></body></html>`;
 const PAGE_WITHOUT_VIEWPORT = "<html><head><meta charset=\"UTF-8\"></head><body>x</body></html>";
 
 /**
@@ -31,6 +37,11 @@ async function makePair(): Promise<{ repoRoot: string; siteRoot: string }> {
   }
   // The repo's own copies are the pristine export, without a viewport.
   await writeFile(join(repoRoot, "paprika-export", "index.html"), PAGE_WITHOUT_VIEWPORT);
+  // The built indexes are the generated ones, linking every recipe: one at the
+  // site root and one at the in-the-wild paprika-export/index.html URL.
+  const all = ["Älplermagronen.html", HEBREW_RECIPE];
+  await writeFile(join(siteRoot, "paprika-export", "index.html"), indexLinking(all));
+  await writeFile(join(siteRoot, "index.html"), indexLinking(all, "paprika-export/"));
 
   return { repoRoot, siteRoot };
 }
@@ -47,7 +58,7 @@ describe("verifySite", () => {
 
     const report = await verifySite({ repoRoot, siteRoot, canaries });
 
-    assert.equal(report.htmlChecked, 3);
+    assert.equal(report.htmlChecked, 4);
     assert.equal(report.images, 2);
   });
 
@@ -116,6 +127,40 @@ describe("verifySite", () => {
         }),
       /Never Existed/,
     );
+  });
+
+  test("fails when the generated index does not link every recipe", async () => {
+    const { repoRoot, siteRoot } = await makePair();
+    await writeFile(
+      join(siteRoot, "paprika-export", "index.html"),
+      indexLinking([HEBREW_RECIPE]), // Älplermagronen dropped
+    );
+
+    await assert.rejects(
+      () => verifySite({ repoRoot, siteRoot, canaries }),
+      /index[\s\S]*Älplermagronen/,
+    );
+  });
+
+  test("fails when the root landing page does not link every recipe", async () => {
+    const { repoRoot, siteRoot } = await makePair();
+    await writeFile(
+      join(siteRoot, "index.html"),
+      indexLinking([HEBREW_RECIPE], "paprika-export/"), // Älplermagronen dropped
+    );
+
+    await assert.rejects(
+      () => verifySite({ repoRoot, siteRoot, canaries }),
+      /index\.html[\s\S]*Älplermagronen/,
+    );
+  });
+
+  test("accepts an index whose hrefs are percent-encoded", async () => {
+    const { repoRoot, siteRoot } = await makePair();
+
+    const report = await verifySite({ repoRoot, siteRoot, canaries });
+
+    assert.equal(report.htmlChecked, 4);
   });
 
   test("reports every problem at once, not just the first", async () => {

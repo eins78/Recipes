@@ -40,18 +40,16 @@ jobs:
 
       - uses: actions/configure-pages@v6
 
-      # The same builder the legacy branch build used, so /Recipes/ (the README
-      # rendered by Jekyll's default theme) keeps working exactly as before.
-      - name: Build with Jekyll
-        uses: actions/jekyll-build-pages@v1
-        with:
-          source: ./
-          destination: ./_site
-
-      # jekyll-build-pages runs in a container as root, so _site comes back
-      # owned by root and the runner user cannot write into it.
-      - name: Take ownership of the build output
-        run: sudo chown -R "$(id -u):$(id -g)" _site
+      # Copies the export and writes the generated index at both the site root
+      # and paprika-export/index.html. This replaced Jekyll: its only remaining
+      # job was rendering README.md into the landing page, and the generated
+      # index now holds that slot. Dropping it also removed the container step
+      # and the `sudo chown` that existed only because it ran as root.
+      #
+      # Runs before injection: the generated pages carry their own viewport
+      # meta, so the injector skips them.
+      - name: Build the site
+        run: node tools/build-site.ts . _site
 
       - name: Inject viewport meta
         run: node tools/inject-viewport.ts _site
