@@ -43,7 +43,7 @@ const NAME = /<h1[^>]*itemprop="name"[^>]*>([\s\S]*?)<\/h1>/i;
 const CATEGORIES = /<p[^>]*itemprop="recipeCategory"[^>]*>([\s\S]*?)<\/p>/i;
 
 /** Only the entities Paprika actually emits: &apos; &amp; &quot; &gt; &lt;. */
-const decodeEntities = (text: string): string =>
+export const decodeEntities = (text: string): string =>
   text
     .replace(/&apos;/g, "'")
     .replace(/&quot;/g, '"')

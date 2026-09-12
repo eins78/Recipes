@@ -36,12 +36,31 @@ export interface VerifyOptions {
 export interface VerifyReport {
   readonly htmlChecked: number;
   readonly images: number;
+  readonly recipesJson: number;
 }
 
 const countViewports = (html: string): number =>
   html.match(/<meta[^>]+name\s*=\s*["']?viewport\b/gi)?.length ?? 0;
 
 const sorted = (values: Iterable<string>): string[] => [...values].sort();
+
+/** A shallow shape check: the fields recipes.json's own build gate must not
+ *  silently drop. Deliberately not a full schema — that lives with the parser. */
+interface RecipeDetailShape {
+  readonly id: string;
+  readonly ingredients: readonly string[];
+}
+
+interface RecipesFileShape {
+  readonly generated: string;
+  readonly exportCommit: string;
+  readonly exportDate: string;
+  readonly count: number;
+  readonly recipes: readonly RecipeDetailShape[];
+}
+
+const PURE_QUANTITY = /^[\d\s./-]+$/;
+const EXPORT_COMMIT = /^[0-9a-f]{40}$/;
 
 export async function verifySite(options: VerifyOptions): Promise<VerifyReport> {
   const { repoRoot, siteRoot, canaries = DEFAULT_CANARIES } = options;
@@ -133,11 +152,125 @@ export async function verifySite(options: VerifyOptions): Promise<VerifyReport> 
     problems.push(`canary path(s) absent from the site:\n  ${absentCanaries.join("\n  ")}`);
   }
 
+  // 6. recipes.json — the machine-readable export Tachikoma reads. A count is
+  //    not pinned here: Max re-exports by hand and the corpus grows between
+  //    exports, so the gate checks shape and set-consistency, not a number.
+  const recipesJsonRaw = await readFile(join(siteRoot, "recipes.json"), "utf8").catch(() => null);
+  let recipesJsonCount = 0;
+
+  if (recipesJsonRaw === null) {
+    problems.push("recipes.json is missing from the built site");
+  } else {
+    let parsed: RecipesFileShape | undefined;
+    try {
+      parsed = JSON.parse(recipesJsonRaw) as RecipesFileShape;
+    } catch (cause) {
+      problems.push(`recipes.json is not valid JSON: ${(cause as Error).message}`);
+    }
+
+    if (parsed !== undefined) {
+      recipesJsonCount = parsed.count;
+
+      if (parsed.count !== parsed.recipes.length) {
+        problems.push(
+          `recipes.json count (${parsed.count}) does not match its recipes array (${parsed.recipes.length})`,
+        );
+      }
+
+      // Set equality against the recipe pages actually in the site, both
+      // directions — same style as check 1, and it catches a parser that
+      // silently drops or duplicates a recipe even when the count matches.
+      const jsonIds = new Set(parsed.recipes.map((r) => r.id));
+      if (jsonIds.size !== parsed.recipes.length) {
+        problems.push(
+          `recipes.json has ${parsed.recipes.length - jsonIds.size} duplicate id(s)`,
+        );
+      }
+      const htmlIds = new Set(recipeFiles.map((f) => f.replace(/\.html?$/i, "")));
+
+      const missingFromJson = sorted(htmlIds).filter((id) => !jsonIds.has(id));
+      if (missingFromJson.length > 0) {
+        problems.push(
+          `${missingFromJson.length} recipe(s) missing from recipes.json:\n  ${missingFromJson.join("\n  ")}`,
+        );
+      }
+      const extraInJson = sorted(jsonIds).filter((id) => !htmlIds.has(id));
+      if (extraInJson.length > 0) {
+        problems.push(
+          `${extraInJson.length} id(s) in recipes.json with no matching recipe page:\n  ${extraInJson.join("\n  ")}`,
+        );
+      }
+
+      // Recipes genuinely without ingredients exist in the source data (see
+      // header comment) — the gate does not forbid them. It instead demands
+      // that recipes.json agree with the built HTML about *which* recipes
+      // those are, so a parser bug that drops ingredients it shouldn't still
+      // gets caught.
+      const expectedEmpty = new Set<string>();
+      // Only pages actually present in the built site: a missing page is
+      // already reported by check 1, and re-reading it here would throw
+      // ENOENT before every problem has had a chance to be collected.
+      for (const f of recipeFiles.filter((r) => siteHtml.has(`Recipes/${r}`))) {
+        const html = await readFile(join(siteRoot, EXPORT_DIR, "Recipes", f), "utf8");
+        if (!html.includes('itemprop="recipeIngredient"')) {
+          expectedEmpty.add(f.replace(/\.html?$/i, ""));
+        }
+      }
+      const actualEmpty = new Set(
+        parsed.recipes.filter((r) => r.ingredients.length === 0).map((r) => r.id),
+      );
+      const shouldHaveIngredients = sorted(actualEmpty).filter((id) => !expectedEmpty.has(id));
+      if (shouldHaveIngredients.length > 0) {
+        problems.push(
+          `${shouldHaveIngredients.length} recipe(s) have ingredients in the HTML but not in recipes.json:\n  ${shouldHaveIngredients.join("\n  ")}`,
+        );
+      }
+      const shouldBeEmpty = sorted(expectedEmpty).filter((id) => !actualEmpty.has(id));
+      if (shouldBeEmpty.length > 0) {
+        problems.push(
+          `${shouldBeEmpty.length} recipe(s) have no ingredients in the HTML but recipes.json claims some:\n  ${shouldBeEmpty.join("\n  ")}`,
+        );
+      }
+
+      // The brief's named trap: a regex that stops at the first "</" returns
+      // only the <strong>-wrapped quantity ("1", "1 3/4", …) instead of the
+      // ingredient line. That failure mode makes nearly every ingredient
+      // string pure digits/fractions/whitespace; the correct parse makes none.
+      const allIngredients = parsed.recipes.flatMap((r) => r.ingredients);
+      if (allIngredients.length > 0) {
+        const quantityOnly = allIngredients.filter((i) => PURE_QUANTITY.test(i));
+        const ratio = quantityOnly.length / allIngredients.length;
+        if (ratio > 0.05) {
+          problems.push(
+            `${quantityOnly.length} of ${allIngredients.length} ingredient strings ` +
+              `(${(ratio * 100).toFixed(0)}%) are quantity-only — the parser likely ` +
+              `regressed to capturing only the nested <strong> amount`,
+          );
+        }
+      }
+
+      if (!EXPORT_COMMIT.test(parsed.exportCommit)) {
+        problems.push(`recipes.json exportCommit is not a full SHA: "${parsed.exportCommit}"`);
+      }
+      if (Number.isNaN(Date.parse(parsed.exportDate))) {
+        problems.push(`recipes.json exportDate does not parse as a date: "${parsed.exportDate}"`);
+      }
+      if (Number.isNaN(Date.parse(parsed.generated))) {
+        problems.push(`recipes.json generated does not parse as a date: "${parsed.generated}"`);
+      }
+    }
+
+    // Image data must never leak into this file — being small is the point.
+    if (/Images\//.test(recipesJsonRaw) || /\.jpe?g/i.test(recipesJsonRaw)) {
+      problems.push("recipes.json appears to contain image paths or filenames");
+    }
+  }
+
   if (problems.length > 0) {
     throw new Error(`site verification failed:\n\n${problems.join("\n\n")}`);
   }
 
-  return { htmlChecked: allHtml.length, images: siteImages };
+  return { htmlChecked: allHtml.length, images: siteImages, recipesJson: recipesJsonCount };
 }
 
 const isMain =
@@ -149,6 +282,6 @@ if (isMain) {
   const siteRoot = process.argv[3] ?? "_site";
   const report = await verifySite({ repoRoot, siteRoot });
   console.log(
-    `verified: ${report.htmlChecked} page(s) each with one viewport meta, ${report.images} image(s) intact`,
+    `verified: ${report.htmlChecked} page(s) each with one viewport meta, ${report.images} image(s) intact, recipes.json holds ${report.recipesJson} recipe(s)`,
   );
 }
