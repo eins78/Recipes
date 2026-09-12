@@ -27,7 +27,12 @@ jobs:
     permissions:
       contents: read
     steps:
+      # Full history: build-recipes-json.ts derives recipes.json's exportDate
+      # from `git log -- paprika-export`, which needs more than the last
+      # commit — the default depth-1 checkout would find nothing.
       - uses: actions/checkout@v7
+        with:
+          fetch-depth: 0
 
       - uses: actions/setup-node@v7
         with:
@@ -50,6 +55,12 @@ jobs:
       # meta, so the injector skips them.
       - name: Build the site
         run: node tools/build-site.ts . _site
+
+      # Publishes recipes.json beside the generated index: the whole
+      # collection, parsed and stripped of markup, for a consumer that wants
+      # the data rather than the rendered pages (Tachikoma, meal planning).
+      - name: Build recipes.json
+        run: node tools/build-recipes-json.ts . _site
 
       - name: Inject viewport meta
         run: node tools/inject-viewport.ts _site
