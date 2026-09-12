@@ -32,9 +32,11 @@ The brief estimated ~0.11 MB. Measured plain-text volume per field across the co
 
 Ingredients alone is close to the brief's whole-file estimate — it reads as a partial
 extraction measured before the JSON wrapper and the other included fields. The real
-file is **530 KB** for all 247 recipes — still one fetch, still small enough to hand
-a model in a single context, which is what actually mattered for the "no search
-index, no embeddings" decision in the brief.
+file is **530 KB** for all 247 recipes — about 5x the brief's estimate, but still one
+fetch and still comfortably one context. The brief's "no search index, no embeddings,
+no retrieval step" conclusion survives the correction unchanged; it just has less
+headroom than claimed, and that headroom will keep shrinking as the corpus grows
+between exports.
 
 ## The trap: nested quantity vs. ingredient line
 
