@@ -18,6 +18,13 @@ grew by 16 recipes between exports, and Max re-exports by hand on no fixed sched
 That is also why nothing below gates on 247, or on any exact count: a collapse is the
 signal worth catching, not a specific number.
 
+Worth flagging for whoever hits this next: **231 is also, separately, the number of
+pages in this export carrying `itemprop="image"`.** That's a coincidence, not the
+explanation — the real cause is the stale submodule above — but it's exactly the kind
+of tidy-looking number that gets adopted as the reason when it happens to line up
+with the number you're trying to explain. It was checked and ruled out here rather
+than assumed.
+
 ## The size estimate was also wrong, and for the same root cause
 
 The brief estimated ~0.11 MB. Measured plain-text volume per field across the corpus:
@@ -111,6 +118,27 @@ it derives the expected empty-ingredient set from the built HTML itself and asse
 `recipes.json` agrees, so the *shape* is checked (a parser that silently drops
 ingredients elsewhere still fails the build) without pinning today's snapshot, since
 the actual set can shift with the next hand-export.
+
+## Two places this deliberately goes further than the brief asked
+
+The brief said "verify your ingredients against the rendered text of several recipes
+by hand" and named four recipes as the parser's known gaps. Both were followed as a
+starting point, then turned into something that outlives this session:
+
+- **The hand check became a build gate.** The brief's ask was satisfied by checking
+  the probe recipe by hand (see the trap section above) — but a hand check only
+  catches a regression if someone remembers to redo it. `verify-site.ts` now computes
+  the quantity-only ratio on every build, so a future change to the parser (by anyone,
+  including a future Claude session with no memory of this one) fails loudly instead
+  of quietly shipping broken ingredients.
+- **The four named gaps became a derived check, not a pinned list.** Hard-coding
+  `Arroz Rojo`, `Dumpling Soup`, `Chickpea Overnight Salad`, and `Dim Sum  Dumpling
+  Sauce` would have matched the brief literally, but it would break on Max's very
+  next Paprika export the moment the set of ingredient-less recipes changes — which
+  it will, since these are gaps in his data entry, not a fixed property of the
+  library. The gate instead derives the expected empty-ingredient set from the built
+  HTML itself and checks `recipes.json` agrees, so it verifies the same property
+  without expiring.
 
 ## New `verify-site.ts` check
 
