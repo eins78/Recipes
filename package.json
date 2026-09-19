@@ -10,6 +10,7 @@
   "scripts": {
     "test": "node --test tools/*.test.ts",
     "inject-viewport": "node tools/inject-viewport.ts",
-    "verify-site": "node tools/verify-site.ts"
+    "verify-site": "node tools/verify-site.ts",
+    "build-recipes-json": "node tools/build-recipes-json.ts"
   }
 }
