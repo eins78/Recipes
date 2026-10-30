@@ -5,7 +5,7 @@
   "type": "module",
   "description": "Post-processes the Paprika HTML export before it is published to GitHub Pages.",
   "engines": {
-    "node": ">=22.18"
+    "node": ">=26"
   },
   "scripts": {
     "test": "node --test tools/*.test.ts",
